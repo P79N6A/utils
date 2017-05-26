@@ -13,6 +13,8 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 const server = require('http').createServer(app);
+//const root = __dirname;
+const root = '/Users/smalldragonluo/code/nodejs/test/webpack';
 
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -21,7 +23,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(root)));
 
 // page route
 app.get('/', (req, res) => {
@@ -42,12 +44,6 @@ app.get('/index.css', (req, res) => {
   res.send('');
 });
 
-app.get('/bundle3', (req, res) => {
-  res.header('Content-Type', 'application/javascript; charset=utf-8');
-
-  res.send(getFileString('bundle3.js'));
-});
-
 app.get('/assets', (req, res) => {
   res.header('Content-Type', 'application/javascript; charset=utf-8');
 
@@ -55,7 +51,7 @@ app.get('/assets', (req, res) => {
 });
 
 // start server
-server.listen(8080, (err) => {
+server.listen(4444, (err) => {
   if (err) {
     console.log(err);
   } else {
@@ -65,7 +61,7 @@ server.listen(8080, (err) => {
 
 // renderer
 function render(page, res) {
-  let html = fs.readFileSync(path.join(__dirname, page));
+  let html = fs.readFileSync(path.join(root, page));
 
   res.set('Content-Type', 'text/html');
   res.send(html);
@@ -73,5 +69,5 @@ function render(page, res) {
 
 // getFileString
 function getFileString(_path) {
-  return fs.readFileSync(path.join(__dirname, _path), 'utf-8');
+  return fs.readFileSync(path.join(root, _path), 'utf-8');
 }

@@ -13,7 +13,7 @@ var compiler = Tpl(
          </div>\
        <% } %>\
    <% } %>'
-  );
+);
 
 function Tpl(tpl) {
   var snippet = tpl.split(/(?=<%)|(%>)/);
@@ -21,6 +21,7 @@ function Tpl(tpl) {
     'var _tplSnippet = [];',
     'with(_tplData) {'
   ];
+
   for (var i = 0; i < snippet.length; ++i) {
     if (typeof snippet[i] !== 'undefined' && snippet[i] !== '%>') {
       if (snippet[i].substring(0, 2) === '<%') {
@@ -37,6 +38,8 @@ function Tpl(tpl) {
       }
     }
   }
+
   mCode.push('}', 'return _tplSnippet.join(\'\');');
+
   return new Function('_tplData', mCode.join(''));
 }

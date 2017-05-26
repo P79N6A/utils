@@ -6,10 +6,10 @@
 module.exports = {
   /**
    * 节流阀
-   * @param fn
-   * @param interval
-   * @param context
-   * @param accurate
+   * @param fn        节流方法
+   * @param interval  时间间隔
+   * @param context   上下文
+   * @param accurate  是否保证最后一次调用被执行
    * @returns {Function}
    */
   throttle: function(fn, interval, context, accurate) {
@@ -30,10 +30,9 @@ module.exports = {
     } else {
       return function() {
         var currentTime = new Date().getTime();
-        var args = arguments;
 
         if (!lastTime || currentTime - lastTime >= interval) {
-          fn.apply(context, Array.prototype.slice.call(args));
+          fn.apply(context, Array.prototype.slice.call(arguments));
           lastTime = currentTime;
         }
       };
@@ -48,19 +47,19 @@ module.exports = {
    */
   Easing: function() {
     var
-      debug            = false,  //如果debug，遇到异常将抛出
-      fx               = {          //缓动函数
+      debug = false,  //如果debug，遇到异常将抛出
+      fx = {          //缓动函数
         linear: function(currentTime, initialDistance, totalDistance, duration) {   //自带一个线性缓动函数
           return initialDistance + (currentTime / duration * totalDistance);
         }
       },
-      getTime          = (window.performance && performance.now) ? function() {              //获取当前时间（ms或更精确）
+      getTime = (window.performance && performance.now) ? function() {              //获取当前时间（ms或更精确）
         return performance.now();
       } : function() {                                                              //获取当前时间（ms或更精确）
         return new Date().getTime();
       },
       executorCanceler = window.cancelAnimationFrame,                               //取消帧函数
-      executor         = window.requestAnimationFrame                                       //帧执行函数
+      executor = window.requestAnimationFrame                                       //帧执行函数
         || window.webkitRequestAnimationFrame
         || window.msRequestAnimationFrame
         || window.mozRequestAnimationFrame
@@ -70,7 +69,7 @@ module.exports = {
 
           !function frame() {
             var oldTime = getTime(),
-                tmp     = callbacks;
+              tmp = callbacks;
 
             callbacks = [];
 
@@ -80,7 +79,7 @@ module.exports = {
 
             var
               currentTime = getTime(),
-              delayTime   = Math.max(16.66 - currentTime + oldTime, 0);
+              delayTime = Math.max(16.66 - currentTime + oldTime, 0);
 
             setTimeout(frame, delayTime);
           }();
@@ -101,68 +100,68 @@ module.exports = {
             return context.id;
           };
         }(),
-      animate          = function(attribute, distances, duration, timingFunction, completeCallback) {  // 为每个属性运行此函数，类似于启动一个线程（虽然不是真正的线程）
-        var oldTime             = getTime(),
-            animationPassedTime = 0,
-            executorReference   = executor(function anonymous(currentTimeStamp) {
-              animationPassedTime = currentTimeStamp - oldTime;
+      animate = function(attribute, distances, duration, timingFunction, completeCallback) {  // 为每个属性运行此函数，类似于启动一个线程（虽然不是真正的线程）
+        var oldTime = getTime(),
+          animationPassedTime = 0,
+          executorReference = executor(function anonymous(currentTimeStamp) {
+            animationPassedTime = currentTimeStamp - oldTime;
 
-              var computedValues = [];    //computedValues为缓动函数计算值，可能返回数值或者数组（按动画属性不同，比如rgb）
+            var computedValues = [];    //computedValues为缓动函数计算值，可能返回数值或者数组（按动画属性不同，比如rgb）
 
-              if (animationPassedTime >= duration) {
-                if (distances.length > 1) {
-                  for (var j = 0, length = distances.length; j < length; j++) {
-                    computedValues.push(distances[j][0] + distances[j][1]);
-                  }
-                } else {
-                  computedValues = distances[0][0] + distances[0][1];
+            if (animationPassedTime >= duration) {
+              if (distances.length > 1) {
+                for (var j = 0, length = distances.length; j < length; j++) {
+                  computedValues.push(distances[j][0] + distances[j][1]);
                 }
-
-                stop();
               } else {
-                if (distances.length > 1) {
-                  for (var i = 0, length = distances.length; i < length; i++) {
-                    computedValues.push(fx[timingFunction](animationPassedTime, distances[i][0], distances[i][1], duration));
-                  }
-                } else {
-                  computedValues = fx[timingFunction](animationPassedTime, distances[0][0], distances[0][1], duration);
-                }
+                computedValues = distances[0][0] + distances[0][1];
+              }
 
-                animationPassedTime = getTime() - oldTime;
-                executorReference = executor(anonymous);
+              stop();
+            } else {
+              if (distances.length > 1) {
+                for (var i = 0, length = distances.length; i < length; i++) {
+                  computedValues.push(fx[timingFunction](animationPassedTime, distances[i][0], distances[i][1], duration));
+                }
+              } else {
+                computedValues = fx[timingFunction](animationPassedTime, distances[0][0], distances[0][1], duration);
               }
-              attribute.keyframe(computedValues);
-            }, Math.random()),
-            completed           = false,
-            stop                = function(skipCallback) {
-              executorCanceler(executorReference);
-              if (!skipCallback) {
-                completeCallback();      //执行回调函数
-              }
-            };
+
+              animationPassedTime = getTime() - oldTime;
+              executorReference = executor(anonymous);
+            }
+            attribute.keyframe(computedValues);
+          }, Math.random()),
+          completed = false,
+          stop = function(skipCallback) {
+            executorCanceler(executorReference);
+            if (!skipCallback) {
+              completeCallback();      //执行回调函数
+            }
+          };
 
         return {
           stop: stop
         };
       },
-      init             = function(animationVars, duration, timingFunction, callback) {  // Animation 引用的函数，此函数返回一个包含所有动画属性的控制对象（如停止操作），因此可以采取函数调用或者new的方式创建一个动画对象
-        var animateQueue            = {},
-            animationCount          = 0,
-            animationCompletedCount = 0,
-            completeCallback        = function() {
-              return function() {
-                animationCompletedCount++;
+      init = function(animationVars, duration, timingFunction, callback) {  // Animation 引用的函数，此函数返回一个包含所有动画属性的控制对象（如停止操作），因此可以采取函数调用或者new的方式创建一个动画对象
+        var animateQueue = {},
+          animationCount = 0,
+          animationCompletedCount = 0,
+          completeCallback = function() {
+            return function() {
+              animationCompletedCount++;
 
-                if (animationCount === animationCompletedCount) {
-                  typeof timingFunction === 'function' ? timingFunction() : callback && callback();
-                }
-              };
-            }();
+              if (animationCount === animationCompletedCount) {
+                typeof timingFunction === 'function' ? timingFunction() : callback && callback();
+              }
+            };
+          }();
 
         for (var attribute in animationVars) {
           var initialDistance = animationVars[attribute].start,
-              finalDistance   = animationVars[attribute].end,
-              distances       = [];
+            finalDistance = animationVars[attribute].end,
+            distances = [];
 
           if (typeof initialDistance === 'number') {
             distances.push([initialDistance, finalDistance - initialDistance]);
@@ -249,16 +248,15 @@ module.exports = {
 
     return init;
   }(),
-
   /**
    * 对象浅合并
    * @param target
    * @param origin
    */
   merge: function(target, origin) {
-    for (var attribute in origin) {
-      if (origin.hasOwnProperty(attribute)) {
-        target[attribute] = origin[attribute];
+    for (var key in origin) {
+      if (origin.hasOwnProperty(key)) {
+        target[key] = origin[key];
       }
     }
   },
@@ -292,70 +290,20 @@ module.exports = {
 
     return target;
   },
-
   /**
-   * 用于定义一个类
-   * @param constructor
-   * @param parent
-   * @param properties
-   * @param statics
-   * @param isSingleton
-   * @returns {*}
+   * 加载脚本
+   * @param src
    */
-  defineClass: function defineClass(constructor, parent, properties, statics, isSingleton) {
-    // 如果为单例模式，保存实例，并在以后的调用中返回此实例
-    if (isSingleton) {
-      var oldConstructor = constructor,
-          instance;
-      constructor = function() {
-        if (instance) {
-          return instance;
-        }
-        oldConstructor.apply(this, arguments);
-        instance = this;
-      }
-    }
-
-    // 设置原型属性，这意味着传入的构造函数的原型属性将被覆盖 重要：parent内部需要检测参数，下面将会讲到
-    constructor.prototype = parent ? new parent() : {};
-
-    // 将自有属性复制到原型中 将静态属性复制到构造函数中，这意味着将不会继承parent的静态属性
-    this.merge(constructor.prototype, properties);
-    this.merge(constructor, statics);
-
-    // 将构造函数更改为当前构造函数 将parent的引用保留
-    constructor.prototype.constructor = constructor;
-    constructor.prototype.parent = parent;
-    constructor.parent = parent;
-
-    // 借用父类函数
-    constructor.borrow = function(methodName, context, args) {
-      var oldParent;
-
-      if (typeof methodName === "object") {
-        args = context;
-        context = methodName;
-      }
-
-      oldParent = context.parent;
-      context.parent = parent;
-
-      if (typeof methodName === "string") {
-        constructor.prototype[methodName].apply(context, args || []);
-      } else {
-        constructor.apply(context, args || []);
-      }
-
-      context.parent = oldParent;
-    };
-    return constructor;
-  },
   loadScript: function(src) {
     var scriptElmt = document.createElement('script');
 
     scriptElmt.setAttribute('src', src);
     document.getElementsByTagName('head')[0].appendChild(scriptElmt);
   },
+  /**
+   * 加载样式
+   * @param cssStr
+   */
   appendStyleSheet: function(cssStr) {
     var style = document.createElement('style');
 
@@ -369,7 +317,11 @@ module.exports = {
 
     (document.head || document.getElementsByTagName('head')[0]).appendChild(style);
   },
-  // 根据rem获取px global
+  /**
+   * 根据 rem 获取 px
+   * @param rem
+   * @returns {number}
+   */
   getPxByRem: function(rem) {
     try {
       var fontSize = parseFloat(getComputedStyle(document.documentElement)['font-size']);
@@ -378,5 +330,23 @@ module.exports = {
     } catch (e) {
       return rem * 32;
     }
+  },
+  // 判断是否支持sticky属性
+  isStickySupported: function() {
+    var style = ['', '-webkit-', '-ms-', '-moz-', '-o-'].map(function(prefix) {
+      return 'position: ' + prefix + 'sticky'
+    }).join(';');
+    var element = document.createElement('div');
+    var body = document.body;
+
+    element.style.cssText = style;
+
+    body.appendChild(element);
+
+    var isSupported = /sticky/i.test(window.getComputedStyle(element).position);
+
+    body.removeChild(element);
+
+    return isSupported;
   }
 };

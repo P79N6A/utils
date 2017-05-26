@@ -27,12 +27,12 @@ console.log(href);
  * @returns {*}
  */
 function getLocation(url) {
-  var _location;
+  let _location;
 
-  if (!url) {
+  if (typeof url === 'undefined') {
     _location = location;
   } else {
-    var matched = url.match(/(https?:)?\/\/([^\/:?#]+)(:(\d+))?([^?#]+)?(\?[^#]+)?(#.+)?/);
+    let matched = url.match(/(https?:)?\/\/([^\/:?#]+)(:(\d+))?([^?#]+)?(\?[^#]+)?(#.+)?/);
 
     _location = {
       hash: matched[7] || '',
@@ -56,24 +56,25 @@ function getLocation(url) {
  * @returns {{}}
  */
 function getParams(url) {
-  var search;
+  let search;
 
-  if (!url) {
+  if (typeof url === 'undefined') {
     search = location.search;
+  } else if (url[0] === '?') {
+    search = url;
+  } else if (url === '') {
+    return {};
   } else {
-    if (url[0] === '?') {
-      search = url;
-    } else {
-      search = getLocation(url).search;
-    }
+    search = getLocation(url).search;
   }
 
-  var queryArray = (decodeURI(search)).match(/[^&?]+=[^&]+/g) || [];
+  let queryArray = search.match(/[^&?]+=[^&]+/g) || [];
+  let params = {};
 
-  for (var i = 0, params = {}; i < queryArray.length; i++) {
-    var map = queryArray[i].split(/=/);
+  for (let i = 0; i < queryArray.length; i++) {
+    let map = queryArray[i].split(/=/);
 
-    params[map[0]] = map[1];
+    params[map[0]] = decodeURIComponent(map[1]);
   }
 
   return params;
