@@ -10,7 +10,10 @@ const webpack = require('webpack');
 
 module.exports = {
   context: process.cwd(),
-  entry: './src/test.js',
+  entry: {
+    vendor: 'utils',
+    index: './src/index.js'
+  },
   output: {
     path: path.join(__dirname, 'build'),
     filename: '[name].bundle.js'
@@ -20,13 +23,11 @@ module.exports = {
       {
         // 'test' is commonly used to match the file extension
         test: /\.jsx$/,
-
         // 'include' is commonly used to match the directories
         include: [
           path.resolve(__dirname, 'app/src'),
           path.resolve(__dirname, 'app/test')
         ],
-
         // the 'loader'
         loader: 'babel-loader' // or 'babel' because webpack adds the '-loader' automatically
       },
@@ -40,9 +41,22 @@ module.exports = {
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
-        drop_debugger : false
+        drop_debugger: false
       }
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'commons',
+      // (the commons chunk name)
+
+      filename: 'commons.js',
+      // (the filename of the commons chunk)
+
+      // minChunks: 3,
+      // (Modules must be shared between 3 entries)
+
+      // chunks: ['pageA', 'pageB'],
+      // (Only use these entries)
     })
   ],
-  devtool: '#hidden-source-map'
+  devtool: '#source-map'
 };
