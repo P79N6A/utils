@@ -1,0 +1,2 @@
+{{ set(upxGuide = {a: {k: "v"}}) }}
+{{upxGuide.a.k}}

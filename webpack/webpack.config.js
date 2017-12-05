@@ -7,56 +7,59 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
-  context: process.cwd(),
+  context: __dirname,
   entry: {
-    vendor: 'utils',
+    //vendor: ['isarray'],
     index: './src/index.js'
   },
   output: {
-    path: path.join(__dirname, 'build'),
-    filename: '[name].bundle.js'
+    path: './build',
+    filename: '[name].js'
   },
   module: {
     loaders: [
-      {
-        // 'test' is commonly used to match the file extension
-        test: /\.jsx$/,
-        // 'include' is commonly used to match the directories
-        include: [
-          path.resolve(__dirname, 'app/src'),
-          path.resolve(__dirname, 'app/test')
-        ],
-        // the 'loader'
-        loader: 'babel-loader' // or 'babel' because webpack adds the '-loader' automatically
-      },
+      // Extract css files
       {
         test: /\.css$/,
-        loader: 'style!css'
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader')
+      },
+      // Optionally extract less files
+      // or any other compile-to-css language
+      {
+        test: /\.less$/,
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader')
       }
     ]
   },
+  //resolveLoader: {
+  //  'less-loader': require.resolve('less-loader'),
+  //  'css-loader': require.resolve('css-loader'),
+  //  'style-loader': require.resolve('style-loader')
+  //},
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        drop_debugger: false
-      }
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      // (the commons chunk name)
-
-      filename: 'commons.js',
-      // (the filename of the commons chunk)
-
-      // minChunks: 3,
-      // (Modules must be shared between 3 entries)
-
-      // chunks: ['pageA', 'pageB'],
-      // (Only use these entries)
-    })
+    //new webpack.optimize.UglifyJsPlugin({
+    //  compress: {
+    //    warnings: false,
+    //    drop_debugger: false
+    //  }
+    //}),
+    //new webpack.optimize.CommonsChunkPlugin({
+    //  name: 'commons',
+    //  // (the commons chunk name)
+    //
+    //  filename: 'commons.js',
+    //  // (the filename of the commons chunk)
+    //
+    //   minChunks: 2,
+    //  // (Modules must be shared between ? entries)
+    //
+    //  // chunks: ['pageA', 'pageB'],
+    //  // (Only use these entries)
+    //})
+    new ExtractTextPlugin('[name].css')
   ],
   devtool: '#source-map'
 };

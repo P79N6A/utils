@@ -5,10 +5,10 @@
 
 'use strict';
 
-var utils = require('./utils');
+var utils = require('isarray');
 
 console.log('mod a evaluated.');
 
 module.exports = {
-  mod: ''
+  mod: utils
 };

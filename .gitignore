@@ -4,4 +4,6 @@ node_modules
 /spider
 .tmp
 .build
+build
 tmp.*
+.vscode

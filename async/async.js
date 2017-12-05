@@ -5,13 +5,35 @@
 
 'use strict';
 
-test();
+const Promise = require('bluebird');
+const co = require('co');
 
-async function test() {
-  await new Promise((resolve) => {
-    setTimeout(function() {
-      resolve('ok');
-    }, 1000);
-  });
-  console.log('before');
+// Promise.coroutine.addYieldHandler(co);
+
+// test();
+//
+// async function test() {
+//   let ids = [1, 2, 3];
+//   let result = await function* () {
+//     yield new Promise(function(resolve) {
+//       setTimeout(function() {
+//         resolve(ids);
+//       }, 1000);
+//     });
+//   };
+//
+//   console.log(result);
+// }
+
+testArrayIterator();
+
+async function testArrayIterator() {
+  for (let item of [1, 2, 3]) {
+    await new Promise(function(r) {
+      setTimeout(function() {
+        console.log(item);
+        r();
+      }, 1000);
+    });
+  }
 }

@@ -3,5 +3,9 @@ var modb = require('./mod-b');
 
 // 注释
 var smalldragonluo = 1;
+
 debugger;
-console.log(smalldragonluo);
+
+//require('./index.less');
+
+console.log(smalldragonluo, modb.mod);

@@ -39,6 +39,39 @@ module.exports = {
     }
   },
   /**
+   * 返回一个新的方法，此方法包含阀门控制（当其执行完成之前，再次调用此方法将不会执行，也不会有返回值），支持 Promise
+   * @param fn 需要包装的方法
+   * @param context 上下文
+   * @returns {Function}
+   */
+  valve: function(fn, context) {
+    var running = {};
+
+    return function() {
+      var args = Array.prototype.slice.call(arguments);
+      var key = JSON.stringify(args);
+
+      if (!running[key]) {
+        var result = fn.apply(context || this, args);
+
+        // Object.prototype.toString does'nt compatible with bluebird
+        if (result && result.toString && result.toString() === '[object Promise]') {
+          running[key] = key;
+
+          result.then(function() {
+            delete running[key];
+          }, function() {
+            delete running[key];
+          });
+        } else {
+          delete running[key];
+        }
+
+        return result;
+      }
+    };
+  },
+  /**
    * 缓动
    * @param animationVars
    * @param duration
@@ -348,5 +381,19 @@ module.exports = {
     body.removeChild(element);
 
     return isSupported;
+  },
+  /**
+   * 定义一个 const 属性
+   * @param obj
+   * @param key
+   * @param value
+   */
+  defineConst: function(obj, key, value) {
+    Object.defineProperty(obj, key, {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: value
+    });
   }
 };

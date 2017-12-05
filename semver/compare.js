@@ -1,24 +1,20 @@
 /**
  * @author 龙喜<xiaolong.lxl@alibaba-inc.com>
- * @description duoshuo
+ * @description compare
  */
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const Config = {
-  modules: {
-    'a/b/2.0.12/1': 1,
-    'a/b/1.9.22/1': 1,
-    'a/b/2.0.13/1': 1,
-    'a/c/2.0.12/1': 1
-  }
-};
+console.log(
+  _semVerCompare('1.03.23103', '1.3.023110')
+);
 
-//console.log(sinon.stub);
-console.log(_getLatestVersion('a/b/2.0.1/1'));
-
+/**
+ * 获取 define 格式为 group/name/version/* 的最高版本定义
+ * @param moduleName
+ * @returns {*}
+ * @private
+ */
 function _getLatestVersion(moduleName) {
   var nameRegRxp = /([^\/]+\/[^\/]+\/)([^\/]+)\/(.+)/;
   var matchedTarget = moduleName.match(nameRegRxp);
@@ -48,6 +44,13 @@ function _getLatestVersion(moduleName) {
   return satisfiedModName || moduleName;
 }
 
+/**
+ * 比较 semver，仅支持 x.x.x
+ * @param target
+ * @param origin
+ * @returns {Number} -1|0|1
+ * @private
+ */
 function _semVerCompare(target, origin) {
   target = target.split('.');
   origin = origin.split('.');

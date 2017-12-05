@@ -5,7 +5,7 @@
 
 'use strict';
 
-console.log('utils a evaluated.');
+console.log('utils evaluated.');
 
 module.exports = {
   utils: ''

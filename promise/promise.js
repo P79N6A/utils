@@ -32,7 +32,7 @@ Promise.prototype = {
         try {
           success(this.result);
         } catch (e) {
-          status =
+          status = 1;
         }
       }
 

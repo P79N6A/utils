@@ -79,3 +79,5 @@ function getParams(url) {
 
   return params;
 }
+
+module.exports.getLocation = getLocation;

@@ -5,7 +5,7 @@
 
 'use strict';
 
-function Mod(Constructor, Parent, prototype, statics) {
+function Extend(Constructor, Parent, prototype, statics) {
   // 连接原型
   var Connector = function() {};
 
@@ -39,4 +39,4 @@ function merge(target, origin) {
   }
 }
 
-module.exports = Mod;
+module.exports = Extend;

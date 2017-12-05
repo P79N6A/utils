@@ -14,7 +14,9 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const server = require('http').createServer(app);
 //const root = __dirname;
-const root = '/Users/smalldragonluo/code/nodejs/test/webpack';
+let root = '/Users/smalldragonluo/code/nodejs/test/webpack';
+
+//root = '/Users/smalldragonluo/code/def/light-book/dist';
 
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -51,7 +53,7 @@ app.get('/assets', (req, res) => {
 });
 
 // start server
-server.listen(4444, (err) => {
+server.listen(8080, (err) => {
   if (err) {
     console.log(err);
   } else {
