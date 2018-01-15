@@ -9,5 +9,11 @@ const webpack = require('webpack');
 const config = require('./webpack.config');
 
 webpack(config, (err, stats) => {
-  console.log(err, stats);
+  if (err) {
+    console.error(err.stack);
+  } else if (stats.hasErrors()) {
+    console.error(stats.compilation.errors[0].stack);
+  } else {
+    console.log('done');
+  }
 });

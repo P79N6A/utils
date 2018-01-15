@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filters">
+  <defs>
+    <filter id="filter-ripple-2">
+      <feImage xmlns:xlink="http://www.w3.org/1999/xlink"
+               xlink:href="/public/svg/ripple.png"
+               x="7.112512000001772"
+               y="7.112512000001772" width="365.77497599999646"
+               height="365.77497599999646"
+               result="ripple"/>
+      <feDisplacementMap xChannelSelector="R"
+                         yChannelSelector="G"
+                         color-interpolation-filters="sRGB"
+                         in="SourceGraphic"
+                         in2="ripple"
+                         scale="30"
+                         result="dm"/>
+      <feComposite operator="in" in2="ripple"/>
+      <feComposite in2="SourceGraphic"/>
+    </filter>
+  </defs>
+</svg>

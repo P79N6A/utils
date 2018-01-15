@@ -22,9 +22,13 @@ function holidate(date) {
   }
 }
 
+/**
+ * 解析日期字符串（格式为：yyyy-MM-dd HH:mm:ss），不支持时区
+ * @param dateStr
+ * @returns {Date}
+ */
 function parseDate(dateStr) {
-  var dateRegExp = /^(\d{4})\-([0-1]?[0-9])\-([0-3]?[0-9])\s+([0-2]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])(?::(\d{1,3}))?/;
-  var matched = dateStr.match(dateRegExp);
+  var matched = dateStr.match(/^(\d{4})-([0-1]?[0-9])-([0-3]?[0-9])\s+([0-2]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])(?::(\d{1,3}))?/);
 
   if (matched) {
     return new Date(
@@ -36,7 +40,7 @@ function parseDate(dateStr) {
       parseInt(matched[6], 10),
       parseInt(matched[7] || 0, 10)
     );
+  } else {
+    return new Date();
   }
-
-  return new Date();
 }

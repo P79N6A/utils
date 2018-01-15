@@ -79,144 +79,148 @@ module.exports = {
    * @param callback
    */
   Easing: function() {
-    var
-      debug = false,  //如果debug，遇到异常将抛出
-      fx = {          //缓动函数
-        linear: function(currentTime, initialDistance, totalDistance, duration) {   //自带一个线性缓动函数
-          return initialDistance + (currentTime / duration * totalDistance);
-        }
-      },
-      getTime = (window.performance && performance.now) ? function() {              //获取当前时间（ms或更精确）
-        return performance.now();
-      } : function() {                                                              //获取当前时间（ms或更精确）
-        return new Date().getTime();
-      },
-      executorCanceler = window.cancelAnimationFrame,                               //取消帧函数
-      executor = window.requestAnimationFrame                                       //帧执行函数
-        || window.webkitRequestAnimationFrame
-        || window.msRequestAnimationFrame
-        || window.mozRequestAnimationFrame
-        || window.oRequestAnimationFrame
-        || function() {
-          var callbacks = [];
+    return;
+    if (typeof window === 'undefined') {
+      throw new Error('only works in browser');
+    }
 
-          !function frame() {
-            var oldTime = getTime(),
-              tmp = callbacks;
+    var debug = false;  //如果debug，遇到异常将抛出
+    var fx = {          //缓动函数
+      linear: function(currentTime, initialDistance, totalDistance, duration) {   //自带一个线性缓动函数
+        return initialDistance + (currentTime / duration * totalDistance);
+      }
+    };
+    var getTime = (window.performance && performance.now) ? function() {              //获取当前时间（ms或更精确）
+      return performance.now();
+    } : function() {                                                              //获取当前时间（ms或更精确）
+      return new Date().getTime();
+    };
+    var executorCanceler = window.cancelAnimationFrame;                               //取消帧函数
+    var executor = window.requestAnimationFrame                                       //帧执行函数
+      || window.webkitRequestAnimationFrame
+      || window.msRequestAnimationFrame
+      || window.mozRequestAnimationFrame
+      || window.oRequestAnimationFrame
+      || function() {
+        var callbacks = [];
 
-            callbacks = [];
+        !function frame() {
+          var oldTime = getTime(),
+            tmp = callbacks;
 
-            for (var i = 0, length = tmp.length; i < length; i++) {
-              tmp[i].callback(oldTime);
+          callbacks = [];
+
+          for (var i = 0, length = tmp.length; i < length; i++) {
+            tmp[i].callback(oldTime);
+          }
+
+          var
+            currentTime = getTime(),
+            delayTime = Math.max(16.66 - currentTime + oldTime, 0);
+
+          setTimeout(frame, delayTime);
+        }();
+
+        executorCanceler = function(id) {
+          for (var i = 0, length = callbacks.length; i < length; i++) {
+            if (callbacks[i].id === id) {
+              callbacks.splice(i, 1);
             }
+          }
+        };
 
-            var
-              currentTime = getTime(),
-              delayTime = Math.max(16.66 - currentTime + oldTime, 0);
+        return function(callback) {
+          var context = {callback: callback, id: Math.random()};
 
-            setTimeout(frame, delayTime);
-          }();
+          callbacks.push(context);
 
-          executorCanceler = function(id) {
-            for (var i = 0, length = callbacks.length; i < length; i++) {
-              if (callbacks[i].id === id) {
-                callbacks.splice(i, 1);
+          return context.id;
+        };
+      }();
+    var animate = function(attribute, distances, duration, timingFunction, completeCallback) {  // 为每个属性运行此函数，类似于启动一个线程（虽然不是真正的线程）
+      var oldTime = getTime(),
+        animationPassedTime = 0,
+        executorReference = executor(function anonymous(currentTimeStamp) {
+          animationPassedTime = currentTimeStamp - oldTime;
+
+          var computedValues = [];    //computedValues为缓动函数计算值，可能返回数值或者数组（按动画属性不同，比如rgb）
+
+          if (animationPassedTime >= duration) {
+            if (distances.length > 1) {
+              for (var j = 0, length = distances.length; j < length; j++) {
+                computedValues.push(distances[j][0] + distances[j][1]);
               }
-            }
-          };
-
-          return function(callback) {
-            var context = {callback: callback, id: Math.random()};
-
-            callbacks.push(context);
-
-            return context.id;
-          };
-        }(),
-      animate = function(attribute, distances, duration, timingFunction, completeCallback) {  // 为每个属性运行此函数，类似于启动一个线程（虽然不是真正的线程）
-        var oldTime = getTime(),
-          animationPassedTime = 0,
-          executorReference = executor(function anonymous(currentTimeStamp) {
-            animationPassedTime = currentTimeStamp - oldTime;
-
-            var computedValues = [];    //computedValues为缓动函数计算值，可能返回数值或者数组（按动画属性不同，比如rgb）
-
-            if (animationPassedTime >= duration) {
-              if (distances.length > 1) {
-                for (var j = 0, length = distances.length; j < length; j++) {
-                  computedValues.push(distances[j][0] + distances[j][1]);
-                }
-              } else {
-                computedValues = distances[0][0] + distances[0][1];
-              }
-
-              stop();
             } else {
-              if (distances.length > 1) {
-                for (var i = 0, length = distances.length; i < length; i++) {
-                  computedValues.push(fx[timingFunction](animationPassedTime, distances[i][0], distances[i][1], duration));
-                }
-              } else {
-                computedValues = fx[timingFunction](animationPassedTime, distances[0][0], distances[0][1], duration);
-              }
-
-              animationPassedTime = getTime() - oldTime;
-              executorReference = executor(anonymous);
+              computedValues = distances[0][0] + distances[0][1];
             }
-            attribute.keyframe(computedValues);
-          }, Math.random()),
-          completed = false,
-          stop = function(skipCallback) {
-            executorCanceler(executorReference);
-            if (!skipCallback) {
-              completeCallback();      //执行回调函数
+
+            stop();
+          } else {
+            if (distances.length > 1) {
+              for (var i = 0, length = distances.length; i < length; i++) {
+                computedValues.push(fx[timingFunction](animationPassedTime, distances[i][0], distances[i][1], duration));
+              }
+            } else {
+              computedValues = fx[timingFunction](animationPassedTime, distances[0][0], distances[0][1], duration);
+            }
+
+            animationPassedTime = getTime() - oldTime;
+            executorReference = executor(anonymous);
+          }
+          attribute.keyframe(computedValues);
+        }, Math.random()),
+        completed = false,
+        stop = function(skipCallback) {
+          executorCanceler(executorReference);
+          if (!skipCallback) {
+            completeCallback();      //执行回调函数
+          }
+        };
+
+      return {
+        stop: stop
+      };
+    };
+    var init = function(animationVars, duration, timingFunction, callback) {  // Animation 引用的函数，此函数返回一个包含所有动画属性的控制对象（如停止操作），因此可以采取函数调用或者new的方式创建一个动画对象
+      var animateQueue = {},
+        animationCount = 0,
+        animationCompletedCount = 0,
+        completeCallback = function() {
+          return function() {
+            animationCompletedCount++;
+
+            if (animationCount === animationCompletedCount) {
+              typeof timingFunction === 'function' ? timingFunction() : callback && callback();
             }
           };
+        }();
 
-        return {
-          stop: stop
-        };
-      },
-      init = function(animationVars, duration, timingFunction, callback) {  // Animation 引用的函数，此函数返回一个包含所有动画属性的控制对象（如停止操作），因此可以采取函数调用或者new的方式创建一个动画对象
-        var animateQueue = {},
-          animationCount = 0,
-          animationCompletedCount = 0,
-          completeCallback = function() {
-            return function() {
-              animationCompletedCount++;
+      for (var attribute in animationVars) {
+        var initialDistance = animationVars[attribute].start,
+          finalDistance = animationVars[attribute].end,
+          distances = [];
 
-              if (animationCount === animationCompletedCount) {
-                typeof timingFunction === 'function' ? timingFunction() : callback && callback();
-              }
-            };
-          }();
-
-        for (var attribute in animationVars) {
-          var initialDistance = animationVars[attribute].start,
-            finalDistance = animationVars[attribute].end,
-            distances = [];
-
-          if (typeof initialDistance === 'number') {
-            distances.push([initialDistance, finalDistance - initialDistance]);
-          } else {
-            for (var i = 0, length = initialDistance.length; i < length; i++) {
-              distances.push([initialDistance[i], finalDistance[i] - initialDistance[i]]);
-            }
+        if (typeof initialDistance === 'number') {
+          distances.push([initialDistance, finalDistance - initialDistance]);
+        } else {
+          for (var i = 0, length = initialDistance.length; i < length; i++) {
+            distances.push([initialDistance[i], finalDistance[i] - initialDistance[i]]);
           }
-          // 可以为每个属性指定缓动函数与时间
-          animateQueue[attribute] = animate(animationVars[attribute], distances, animationVars[attribute].duration || duration, animationVars[attribute].timingFunction || (typeof timingFunction === 'string' ? timingFunction : false) || 'linear', completeCallback);
-
-          animationCount++;
         }
+        // 可以为每个属性指定缓动函数与时间
+        animateQueue[attribute] = animate(animationVars[attribute], distances, animationVars[attribute].duration || duration, animationVars[attribute].timingFunction || (typeof timingFunction === 'string' ? timingFunction : false) || 'linear', completeCallback);
 
-        animateQueue.stop = function() {
-          for (var attribute in animateQueue) {
-            animateQueue[attribute].stop && animateQueue[attribute].stop();
-          }
-        };
+        animationCount++;
+      }
 
-        return animateQueue;
+      animateQueue.stop = function() {
+        for (var attribute in animateQueue) {
+          animateQueue[attribute].stop && animateQueue[attribute].stop();
+        }
       };
+
+      return animateQueue;
+    };
 
     init.config = function(configVars) {
       if (configVars) {
@@ -395,5 +399,25 @@ module.exports = {
       writable: false,
       value: value
     });
+  },
+  /**
+   * 找出 target 不在 origin 中的元素
+   * @param {Array} origin
+   * @param {Array} target
+   * @param {Function} match 对比 item 是否一致
+   * @returns {Array}
+   */
+  findDiffInArray: function(origin, target, match) {
+    var diff = [];
+
+    origin.forEach(function(item) {
+      if (!target.some(function(item2) {
+          return match(item, item2);
+        })) {
+        diff.push(item);
+      }
+    });
+
+    return diff;
   }
 };

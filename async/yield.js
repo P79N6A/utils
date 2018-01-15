@@ -7,13 +7,14 @@
 
 const co = require('co');
 
+function getGenerator() {
+  return function* () {
+    console.log('1');
+  };
+}
+
 co(function*() {
-  yield new Promise(function(resolve, reject) {
-    setTimeout(function() {
-      console.log('ok');
-      resolve('ok');
-    }, 1000);
-  });
-}).then(function() {
-  console.log('finished');
+  yield getGenerator()();
+}).catch(function(err) {
+  console.error(err.stack);
 });

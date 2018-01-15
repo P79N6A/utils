@@ -21,6 +21,13 @@ module.exports = {
   },
   module: {
     loaders: [
+      {
+        test: /\.js|jsx$/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['es2015']
+        }
+      },
       // Extract css files
       {
         test: /\.css$/,
@@ -46,19 +53,19 @@ module.exports = {
     //    drop_debugger: false
     //  }
     //}),
-    //new webpack.optimize.CommonsChunkPlugin({
-    //  name: 'commons',
-    //  // (the commons chunk name)
-    //
-    //  filename: 'commons.js',
-    //  // (the filename of the commons chunk)
-    //
-    //   minChunks: 2,
-    //  // (Modules must be shared between ? entries)
-    //
-    //  // chunks: ['pageA', 'pageB'],
-    //  // (Only use these entries)
-    //})
+    new webpack.optimize.CommonsChunkPlugin({
+     name: 'commons',
+     // (the commons chunk name)
+
+     filename: 'commons.js',
+     // (the filename of the commons chunk)
+
+      minChunks: 2,
+     // (Modules must be shared between ? entries)
+
+     // chunks: ['pageA', 'pageB'],
+     // (Only use these entries)
+    }),
     new ExtractTextPlugin('[name].css')
   ],
   devtool: '#source-map'
