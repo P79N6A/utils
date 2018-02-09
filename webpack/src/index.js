@@ -9,3 +9,8 @@ debugger;
 //require('./index.less');
 
 console.log(smalldragonluo, modb.mod);
+
+if (1) {
+  require('@weex-module/message').method();
+  // require('not-exists');
+}

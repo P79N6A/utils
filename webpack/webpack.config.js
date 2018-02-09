@@ -17,7 +17,8 @@ module.exports = {
   },
   output: {
     path: './build',
-    filename: '[name].js'
+    filename: '[name].js',
+    pathinfo: true
   },
   module: {
     loaders: [
@@ -53,20 +54,30 @@ module.exports = {
     //    drop_debugger: false
     //  }
     //}),
-    new webpack.optimize.CommonsChunkPlugin({
-     name: 'commons',
-     // (the commons chunk name)
-
-     filename: 'commons.js',
-     // (the filename of the commons chunk)
-
-      minChunks: 2,
-     // (Modules must be shared between ? entries)
-
-     // chunks: ['pageA', 'pageB'],
-     // (Only use these entries)
-    }),
-    new ExtractTextPlugin('[name].css')
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'commons',
+    //   // (the commons chunk name)
+    //
+    //   filename: 'commons.js',
+    //   // (the filename of the commons chunk)
+    //
+    //   minChunks: 2,
+    //   // (Modules must be shared between ? entries)
+    //
+    //   // chunks: ['pageA', 'pageB'],
+    //   // (Only use these entries)
+    // }),
+    // new ExtractTextPlugin('[name].css')
   ],
+  externals: function(context, request, callback) {
+    console.log('-------->', request);
+
+    if (/^@weex-module\//.test(request)) {
+      return callback(null, 'amd ' + request);
+    }
+
+    // no op
+    callback();
+  },
   devtool: '#source-map'
 };
