@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <title>smalldragonluo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=750, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="renderer" content="webkit">
+  <style>
+     html, body {
+      background-color: #dfe1e2;
+      margin: 0;
+    }
+    #layout {
+      background-color: #d8dcda;
+      box-sizing: border-box;
+      border: 1px solid orangered;
+      width: 10rem;
+      font-size: 0.56rem;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<div id="layout">
+  <script>
+    try {
+      document.writeln('devicePixelRatio: ' + devicePixelRatio);
+      document.writeln('document.documentElement.clientWidth: ' + document.documentElement.clientWidth);
+      document.writeln('window.innerWidth: ' + window.innerWidth);
+      document.writeln('screen.width: ' + screen.width);
+      document.documentElement.style.setProperty('font-size', window.innerWidth / 10 + 'px');
+    } catch (e) {
+      document.writeln('stack: ' + e.stack);
+    }
+    setTimeout(function() {
+      location.reload();
+    }, 1000);
+  </script>
+  <p>
+    > https://www.w3cplus.com/css/viewports.html
+
+    ### 尺寸概念
+    * screen.width：屏幕尺寸，一般 <= 物理分辨率，经过系统换算后给到应用（系统认为这个分辨率是应用最佳体验），其值保持不变，例如 iPhone 7 为 375，MacBook Pro (Retina, 15-inch, Mid 2015) 默认系统缩放为 1440
+    * document.documentElement.clientWidth：文档可供 CSS 布局的宽度（viewport），虽然在 document 元素上面取，但为 viewport 尺寸，不可覆盖，取 meta.width 与 window.innerWidth 最大值（Safari 最大 10000），PC 端不包含滚动条
+    * window.innerWidth：当前浏览器缩放下，可视区域宽度，只随 meta 缩放而变化（基于 screen.width，Safari 最大 x4），PC 端包含滚动条
+    * document.documentElement.offsetWidth：html 元素尺寸
+    * meta.width 默认值为 screen.width
+    * meta 的缩放和手指操控屏幕不是一个概念，只有 meta 缩放影响 clientWidth，而手指缩放和 mac 的两指缩放类似
+
+    ### rem 适配
+    我们需要将 clientWidth 与 innerWidth 保持一致，不然会因为宽度不匹配而出现滚动条，然后视觉稿定统一尺寸，所有单位换算为相对尺寸，例如在一个总宽度 750 的视觉稿中，宽度 75 的元素换算为 1rem，这样总宽度为 10rem，然后浏览器适配时，设置 html 字体大小为 innerWidth / 10，这样 1rem 也代表总宽度的 1/10，视觉稿与浏览器换算得到统一，如果要得到近似 1px 的物理像素尺寸，可以缩放可视区域宽度（innerWidth）为 1/4
+  </p>
+</div>
+</body>
+</html>
