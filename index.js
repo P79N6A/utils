@@ -19,7 +19,7 @@ let root = '/Users/smalldragonluo/code/nodejs/test/webpack';
 //root = '/Users/smalldragonluo/code/def/light-book/dist';
 
 app.use(cookieParser());
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(bodyParser.urlencoded({
   limit: '10mb',
   extended: true
@@ -52,8 +52,12 @@ app.get('/assets', (req, res) => {
   res.send(getFileString('assets.js'));
 });
 
+app.post('/data.json', (req, res) => {
+  res.json({success: 1});
+});
+
 // start server
-server.listen(8080, (err) => {
+server.listen(6001, (err) => {
   if (err) {
     console.log(err);
   } else {

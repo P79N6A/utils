@@ -1,9 +1,10 @@
-node_modules
-.idea
 .DS_Store
-/spider
-.tmp
+.idea
+.vscode
+node_modules
 .build
 build
+/spider
+.tmp
 tmp.*
-.vscode
+/tmp-*
