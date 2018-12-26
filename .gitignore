@@ -8,3 +8,4 @@ build
 .tmp
 tmp.*
 /tmp-*
+.nyc_output/
