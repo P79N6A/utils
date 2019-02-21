@@ -3,10 +3,6 @@
  * @description date
  */
 
-var dateStr = getDateByTime(new Date().getTime());
-
-
-
 /**
  * 解析日期字符串（格式为：yyyy-MM-dd HH:mm:ss），不支持时区
  * @param dateStr
